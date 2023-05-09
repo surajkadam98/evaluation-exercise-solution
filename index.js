@@ -19,28 +19,35 @@ export const shuffleArray = (array) => {
   return array;
 };
 
-export function randomizeOrder (testlet){
-  const pretestItems = [];
-  const operationalItems = [];
+function filterItemsByType(items, itemTypeFilter) {
+  const result = [];
 
-  // separate pretest and operational items
-  testlet.forEach((item) => {
-    if (item.type === "pretest") {
-      pretestItems.push(item);
-    } else {
-      operationalItems.push(item);
+  items.forEach((item) => {
+    if (item.type === itemTypeFilter) {
+      result.push(item);
     }
   });
+  return result;
+}
 
-  // select 2 random pretest items
-  const selectedPretestItems = [];
-  while (selectedPretestItems.length < 2) {
-    const randomIndex = Math.floor(Math.random() * pretestItems.length);
-    const pretestItem = pretestItems[randomIndex];
-    if (!selectedPretestItems.includes(pretestItem)) {
-      selectedPretestItems.push(pretestItem);
+export function selectRandomItems(items, count) {
+  const result = [];
+  while (result.length < count) {
+    const randomIndex = Math.floor(Math.random() * items?.length);
+    const item = items[randomIndex];
+
+    if (!result.includes(item)) {
+      result.push(item);
     }
   }
+  return result;
+}
+
+export function randomizeOrder(testlet) {
+  const pretestItems = filterItemsByType(testlet, "pretest");
+  const operationalItems = filterItemsByType(testlet, "operational");
+  const selectedPretestItems = selectRandomItems(pretestItems, 2);
+
   // remove selected pretest items from the original array
   pretestItems.splice(
     pretestItems.findIndex((item) => item.id === selectedPretestItems[0].id),
@@ -57,6 +64,6 @@ export function randomizeOrder (testlet){
   // insert selected pretest items at the beginning of the array
   shuffledItems.unshift(selectedPretestItems[0]);
   shuffledItems.unshift(selectedPretestItems[1]);
-  return shuffledItems;
-};
 
+  return shuffledItems;
+}
